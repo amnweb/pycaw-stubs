@@ -1,0 +1,13 @@
+# comtypes' _cominterface_meta metaclass turns each interface's `_methods_` into
+# comtypes.instancemethod objects at runtime. The stubs declare them as regular
+# methods (with the Python signatures comtypes gives them) and do not reproduce
+# the untyped metaclass.
+pycaw\.api\.[a-z.]+\.I[A-Za-z0-9]+
+pycaw\.api\.[a-z.]+\.I[A-Za-z0-9]+\.[A-Z]\w*
+# Implementation details added at runtime: comtypes' lookup table for
+# `_case_insensitive_` interfaces, and (Python 3.14+) the POINTER() type that
+# ctypes caches on each interface class
+pycaw\.api\.[a-z.]+\.I[A-Za-z0-9]+\.(__map_case__|__pointer_type__)
+# Added by comtypes to interfaces with an Item method, but Item is not a property
+# here, so assigning to an index always fails.
+pycaw.api.mmdeviceapi.IMMDeviceCollection.__setitem__

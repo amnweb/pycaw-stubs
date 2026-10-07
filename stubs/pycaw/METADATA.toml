@@ -1,0 +1,8 @@
+version = "20260927"
+upstream-repository = "https://github.com/AndreMiras/pycaw"
+# comtypes is untyped (no py.typed), so its types are aliased to Any in the stubs.
+dependencies = ["types-psutil"]
+
+[tool.stubtest]
+supported-platforms = ["win32"]
+ci-platforms = ["win32"]

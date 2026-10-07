@@ -1,0 +1,19 @@
+{
+    // Same settings typeshed uses for its test cases (pyrightconfig.testcases.json).
+    "include": ["**/@tests/test_cases"],
+    "stubPath": "stubs/pycaw",
+    "pythonPlatform": "Windows",
+    "pythonVersion": "3.10",
+    "typeCheckingMode": "strict",
+    "reportImplicitStringConcatenation": "error",
+    "reportUninitializedInstanceVariable": "error",
+    "reportUnnecessaryTypeIgnoreComment": "error",
+    "enableTypeIgnoreComments": true,
+    "reportCallInDefaultInitializer": "none",
+    "reportMissingSuperCall": "none",
+    "reportPrivateUsage": "none",
+    "reportMissingModuleSource": "none",
+    "reportPropertyTypeMismatch": "none",
+    "reportUnnecessaryIsInstance": "none",
+    "reportSelfClsParameterName": "none"
+}

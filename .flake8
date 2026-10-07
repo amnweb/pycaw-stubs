@@ -1,0 +1,6 @@
+[flake8]
+# Flake8 is only used to run flake8-pyi (same configuration as typeshed);
+# everything else is checked by Ruff.
+select = Y
+extend-ignore = Y041,Y090,Y091
+exclude = .venv*,.git

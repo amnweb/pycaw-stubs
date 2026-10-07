@@ -1,0 +1,83 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pycaw-stubs"
+# <upstream pycaw version>.<stub release date>, mirroring typeshed's types-* scheme.
+# The upstream part must match `version` in stubs/pycaw/METADATA.toml.
+version = "20260927.20261007"
+description = "Typing stubs for pycaw"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = ["types-psutil"]
+keywords = ["pycaw", "stubs", "typing", "pyright", "mypy"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Operating System :: Microsoft :: Windows",
+  "Typing :: Stubs Only",
+]
+
+[project.urls]
+Repository = "https://github.com/amnweb/pycaw-stubs"
+Issues = "https://github.com/amnweb/pycaw-stubs/issues"
+Upstream = "https://github.com/AndreMiras/pycaw"
+
+[tool.hatch.build.targets.sdist]
+include = ["/stubs", "/README.md", "/LICENSE", "/pyproject.toml"]
+exclude = ["/stubs/pycaw/@tests"]
+
+[tool.hatch.build.targets.wheel]
+bypass-selection = true
+
+[tool.hatch.build.targets.wheel.force-include]
+# PEP 561 stub-only package: install stubs/pycaw/pycaw as site-packages/pycaw-stubs
+"stubs/pycaw/pycaw" = "pycaw-stubs"
+"stubs/pycaw/METADATA.toml" = "pycaw-stubs/METADATA.toml"
+
+# --- Formatting and linting: same settings as typeshed ---
+
+[tool.black]
+line-length = 130
+target-version = ["py310"]
+skip-magic-trailing-comma = true
+preview = true
+
+[tool.ruff]
+line-length = 130
+fix = true
+# Repository scripts run on CI's Python, not on the stubs' minimum version.
+per-file-target-version = { "scripts/*.py" = "py313" }
+
+[tool.ruff.lint]
+future-annotations = true
+exclude = ["**/test_cases/**/*.py"]
+external = ["F821", "Y"]
+select = [
+  "A", "ARG", "B", "C4", "D", "DTZ", "EXE", "FA", "FBT", "FLY", "I", "N", "PGH", "PIE", "PL",
+  "PTH", "RSE", "RUF", "SLOT", "T10", "TD", "TRY", "UP", "YTT", "E", "F", "W", "ANN2",
+  "ICN001", "TID251",
+  "PYI009", "PYI010", "PYI012", "PYI013", "PYI014", "PYI015", "PYI016", "PYI018", "PYI019",
+  "PYI020", "PYI025", "PYI030", "PYI032", "PYI036", "PYI044", "PYI055", "PYI058", "PYI059",
+  "PYI061", "PYI062", "PYI064",
+  "TC004", "TC005", "TC010",
+]
+ignore = ["E111", "E114", "E117", "W191", "D1", "D202", "D205", "E721", "PLC0415", "PLR09", "PLR2004", "PLR5501", "TRY003"]
+
+[tool.ruff.lint.per-file-ignores]
+"*.pyi" = ["ANN2", "RUF022", "RUF023", "A", "F403", "F405", "N8", "PLC0205", "PLC2701", "PLW0211"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+combine-as-imports = true
+extra-standard-library = ["_typeshed", "typing_extensions"]
+
+[tool.ruff.lint.flake8-import-conventions.aliases]
+typing_extensions = "typing_extensions"
+typing = "typing"

@@ -1,0 +1,24 @@
+{
+    // Same settings typeshed uses for its stubs (pyrightconfig.stricter.json).
+    "include": ["stubs"],
+    "exclude": ["**/@tests/test_cases"],
+    "stubPath": "stubs/pycaw",
+    "pythonPlatform": "Windows",
+    "pythonVersion": "3.10",
+    "typeCheckingMode": "strict",
+    "reportIncompleteStub": "none",
+    "reportCallInDefaultInitializer": "error",
+    "reportImplicitStringConcatenation": "none",
+    "reportUnnecessaryTypeIgnoreComment": "error",
+    "enableTypeIgnoreComments": false,
+    "reportMissingSuperCall": "none",
+    "reportUninitializedInstanceVariable": "none",
+    "reportPrivateUsage": "none",
+    "reportMissingModuleSource": "none",
+    "reportIncompatibleMethodOverride": "none",
+    "reportIncompatibleVariableOverride": "none",
+    "reportPropertyTypeMismatch": "none",
+    "reportOverlappingOverload": "none",
+    "reportSelfClsParameterName": "none",
+    "reportDeprecated": "none"
+}

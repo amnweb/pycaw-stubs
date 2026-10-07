@@ -1,0 +1,152 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: 1
+  FORCE_COLOR: 1
+
+jobs:
+  lint:
+    name: Lint and format (ruff, black, flake8-pyi)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements-tests.txt
+      - run: python scripts/check_metadata.py
+      - run: ruff check --no-fix .
+      # Typeshed only runs a few rules on its test cases
+      - run: ruff check --no-fix --select=FA,I,ICN001,RUF100 --no-force-exclude "stubs/pycaw/@tests/test_cases"
+      - run: black --check --diff .
+      - run: flake8 .
+
+  mypy:
+    name: mypy (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements-tests.txt
+      - name: Check stubs (typeshed's mypy_test.py flags)
+        working-directory: stubs/pycaw
+        run: >
+          mypy pycaw
+          --python-version ${{ matrix.python-version }} --platform win32
+          --strict --allow-untyped-defs --allow-incomplete-defs --allow-subclassing-any
+          --enable-error-code ignore-without-code --enable-error-code redundant-self
+          --warn-incomplete-stub --explicit-package-bases --show-traceback
+      - name: Install the built stubs, as users would
+        run: pip install .
+      - name: Check test cases (typeshed's regr_test.py flags)
+        run: >
+          mypy "stubs/pycaw/@tests/test_cases"
+          --python-version ${{ matrix.python-version }} --platform win32
+          --strict --pretty --disable-error-code=empty-body --warn-unused-ignores
+
+  pyright:
+    name: pyright (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.14"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements-tests.txt
+      - name: Check stubs
+        run: pyright --pythonversion ${{ matrix.python-version }} -p pyrightconfig.json
+      - name: Check test cases
+        run: pyright --pythonversion ${{ matrix.python-version }} -p pyrightconfig.testcases.json
+
+  stubtest:
+    # pycaw (comtypes) can only be imported on Windows
+    name: stubtest (Windows, Python ${{ matrix.python-version }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install pycaw at the version in METADATA.toml
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' stubs/pycaw/METADATA.toml)
+          pip install -r requirements-tests.txt "pycaw==${version}"
+      - name: Run stubtest
+        env:
+          MYPYPATH: stubs/pycaw
+        run: |
+          allowlists=()
+          for f in stubtest_allowlist.txt stubtest_allowlist_win32.txt; do
+            if [ -f "stubs/pycaw/@tests/$f" ]; then allowlists+=(--allowlist "stubs/pycaw/@tests/$f"); fi
+          done
+          python -m mypy.stubtest --show-traceback --strict-type-check-only pycaw "${allowlists[@]}"
+
+  package:
+    name: Build, install and check pycaw's examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - run: pip install build twine
+      - run: python -m build
+      - run: twine check --strict dist/*
+      - name: Check wheel layout (PEP 561 stub-only package)
+        run: |
+          unzip -l dist/*.whl
+          unzip -l dist/*.whl | grep -q "pycaw-stubs/utils.pyi"
+          unzip -l dist/*.whl | grep -q "pycaw-stubs/api/mmdeviceapi/depend/structures.pyi"
+      - name: Install the wheel next to pycaw
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' stubs/pycaw/METADATA.toml)
+          echo "PYCAW_VERSION=${version}" >> "$GITHUB_ENV"
+          pip install dist/*.whl "pycaw==${version}" -r requirements-tests.txt
+      - name: Fetch pycaw's examples for that release
+        run: git clone --depth 1 --branch "v${PYCAW_VERSION}" https://github.com/AndreMiras/pycaw.git upstream
+      - name: Type check pycaw's examples with pyright's default settings (no errors expected)
+        working-directory: upstream/examples
+        run: |
+          # An explicit config, so pyright doesn't pick up this repository's strict pyrightconfig.json
+          echo '{"typeCheckingMode": "standard", "pythonPlatform": "Windows", "pythonVersion": "3.10"}' > pyrightconfig.json
+          pyright -p pyrightconfig.json

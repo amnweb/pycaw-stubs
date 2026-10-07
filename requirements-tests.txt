@@ -1,0 +1,12 @@
+# Same versions as typeshed's requirements-tests.txt / .pre-commit-config.yaml.
+# Type checkers should always be pinned to make failures reproducible.
+mypy==2.3.1
+pyright==1.1.414
+
+black==26.10.0
+flake8==7.4.1
+flake8-pyi==26.5.0
+ruff==0.16.10
+
+typing_extensions>=4.16.0rc2
+types-psutil
