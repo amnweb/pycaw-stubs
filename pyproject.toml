@@ -40,8 +40,6 @@ bypass-selection = true
 "stubs/pycaw/pycaw" = "pycaw-stubs"
 "stubs/pycaw/METADATA.toml" = "pycaw-stubs/METADATA.toml"
 
-# --- Formatting and linting: same settings as typeshed ---
-
 [tool.black]
 line-length = 130
 target-version = ["py310"]
@@ -52,7 +50,7 @@ preview = true
 line-length = 130
 fix = true
 # Repository scripts run on CI's Python, not on the stubs' minimum version.
-per-file-target-version = { "scripts/*.py" = "py313" }
+per-file-target-version = { "scripts/*.py" = "py314" }
 
 [tool.ruff.lint]
 future-annotations = true

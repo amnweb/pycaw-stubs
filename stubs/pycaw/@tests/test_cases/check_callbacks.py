@@ -78,8 +78,6 @@ enumerator = AudioUtilities.GetDeviceEnumerator()
 enumerator.RegisterEndpointNotificationCallback(DeviceMonitor())
 
 
-# Subclasses with their own __init__ must be able to call super().__init__()
-# without pyright strict reporting an unknown type (COMObject is Any).
 class MonitorWithInit(MMNotificationClient):
     def __init__(self) -> None:
         super().__init__()
