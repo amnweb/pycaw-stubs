@@ -76,3 +76,32 @@ manager.UnregisterSessionNotification(notification)
 
 enumerator = AudioUtilities.GetDeviceEnumerator()
 enumerator.RegisterEndpointNotificationCallback(DeviceMonitor())
+
+
+# Subclasses with their own __init__ must be able to call super().__init__()
+# without pyright strict reporting an unknown type (COMObject is Any).
+class MonitorWithInit(MMNotificationClient):
+    def __init__(self) -> None:
+        super().__init__()
+        self.events: list[str] = []
+
+
+class VolumeCallbackWithInit(AudioEndpointVolumeCallback):
+    def __init__(self, name: str) -> None:
+        super().__init__()
+        self.name = name
+
+
+class SessionEventsWithInit(AudioSessionEvents):
+    def __init__(self) -> None:
+        super().__init__()
+
+
+class SessionCreatedWithInit(AudioSessionNotification):
+    def __init__(self) -> None:
+        super().__init__()
+
+
+MonitorWithInit()
+VolumeCallbackWithInit("speakers")
+MMNotificationClient(1)  # type: ignore

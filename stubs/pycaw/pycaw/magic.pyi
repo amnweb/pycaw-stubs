@@ -20,6 +20,7 @@ _R = TypeVar("_R")
 log: Logger
 
 class MagicManager(_COMObject):
+    def __init__(self) -> None: ...
     magic_activated: bool | None
     magic_root_sessions: dict[int, _MagicRootSession]
     expired_magic_root_sessions: set[_MagicRootSession]
