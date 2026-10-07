@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "pycaw-stubs"
 # <upstream pycaw version>.<stub release date>, mirroring typeshed's types-* scheme.
 # The upstream part must match `version` in stubs/pycaw/METADATA.toml.
-version = "20260927.20261007"
+version = "20260927.20261008"
 description = "Typing stubs for pycaw"
 readme = "README.md"
 requires-python = ">=3.10"
