@@ -12,6 +12,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
+authors = [{ name = "AmN" }]
 dependencies = ["types-psutil"]
 keywords = ["pycaw", "stubs", "typing", "pyright", "mypy"]
 classifiers = [
@@ -23,6 +24,7 @@ classifiers = [
 
 [project.urls]
 Repository = "https://github.com/amnweb/pycaw-stubs"
+Homepage = "https://github.com/amnweb/pycaw-stubs"
 Issues = "https://github.com/amnweb/pycaw-stubs/issues"
 Upstream = "https://github.com/AndreMiras/pycaw"
 
