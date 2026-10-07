@@ -1,10 +1,4 @@
-"""Validate stubs/pycaw/METADATA.toml and keep pyproject.toml in sync with it.
-
-Usage: python scripts/check_metadata.py [RELEASE_TAG]
-
-When RELEASE_TAG (e.g. "v20260927.20261007") is given, it must match the
-package version in pyproject.toml.
-"""
+"""Usage: python scripts/check_metadata.py [RELEASE_TAG]."""
 
 from __future__ import annotations
 
